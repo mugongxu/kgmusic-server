@@ -24,6 +24,7 @@ api.forEach(item => {
       if (item.linkKey) {
         link = link + req.query[item.linkKey];
       }
+      console.log(link);
       ajax.get(link, req.query, (response, error) => {
         // 处理数据，转化成自己项目统一结构
         if (!error && response.statusCode == 200) {

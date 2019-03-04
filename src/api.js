@@ -6,7 +6,7 @@ const api = [
   // 音乐歌单
   { url: proxy + '/plist/index', link: 'http://m.kugou.com/plist/index&json=true', method: 'GET' },
   // 歌单下音乐列表
-  { url: proxy + '/plist/list', link: 'http://m.kugou.com/plist/list/125032?json=true', method: 'GET' },
+  { url: proxy + '/plist/list', link: 'http://m.kugou.com/plist/list/', method: 'GET', linkKey: 'specialid' },
   // 音乐排行榜
   { url: proxy + '/rank/list', link: 'http://m.kugou.com/rank/list&json=true', method: 'GET' },
   // 排行榜歌曲列表
@@ -20,7 +20,7 @@ const api = [
   // 歌曲详情
   { url: proxy + '/song/info', link: 'http://m.kugou.com/app/i/getSongInfo.php', method: 'GET' },
   // 歌曲详情 - 带歌词
-  { url: proxy + '/song/detail', link: 'http://m.kugou.com/yy/index.php', method: 'GET' },
+  { url: proxy + '/song/detail', link: 'http://www.kugou.com/yy/index.php', method: 'GET' },
   // 热门搜索列表
   { url: proxy + '/search/hot', link: 'http://mobilecdn.kugou.com/api/v3/search/hot', method: 'GET' },
   // 音乐搜索
