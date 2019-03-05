@@ -2,7 +2,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const request = require('request');
 const ajax = require('./src/ajax.js');
 const api = require('./src/api.js');
 // body-parser解析
@@ -22,9 +21,9 @@ api.forEach(item => {
       // 处理link拼接
       let link = item.link;
       if (item.linkKey) {
-        link = link + req.query[item.linkKey];
+        const reg = new RegExp('{' + item.linkKey + '}');
+        link = link.replace(reg, req.query[item.linkKey]);
       }
-      console.log(link);
       ajax.get(link, req.query, (response, error) => {
         // 处理数据，转化成自己项目统一结构
         if (!error && response.statusCode == 200) {
