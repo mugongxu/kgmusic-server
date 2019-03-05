@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ // 表单请求
   extended: true
 }));
 // 监听
-app.listen(13770, () => {
+app.listen(13770, '0.0.0.0', () => {
   console.log('服务器开启');
 });
 
