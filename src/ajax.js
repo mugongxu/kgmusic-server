@@ -10,8 +10,10 @@ const ajax = {
       method: 'GET',
       qs: data,
       json: true,
+      host: 'm.kugou.com',
       headers: {
-        'content-type': 'application/json',
+        'Host': 'm.kugou.com',
+        'Referer': 'http://m.kugou.com/'
       }
     }, (error, response) => {
       callback(response, error);
