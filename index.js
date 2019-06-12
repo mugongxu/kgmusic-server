@@ -26,13 +26,13 @@ api.forEach(item => {
       }
       ajax.get(link, req.query, (response, error) => {
         // 处理数据，转化成自己项目统一结构
-        if (!error && response.statusCode == 200) {
+        if (!error && response.status == 200) {
           res.send({
             errorCode: null,
             errorMessage: null,
             status: 0,
             success: true,
-            ...response.body
+            ...response.data
           });
         } else {
           res.send({
@@ -54,13 +54,13 @@ api.forEach(item => {
       }
       ajax.post(link, req.body, (response, error) => {
         // 处理数据，转化成自己项目统一结构
-        if (!error && response.statusCode == 200) {
+        if (!error && response.status == 200) {
           res.send({
             errorCode: null,
             errorMessage: null,
             status: 0,
             success: true,
-            ...response.body
+            ...response.data
           });
         } else {
           res.send({

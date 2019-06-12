@@ -1,36 +1,59 @@
 /**
  * 通用AJAX客户端
  */
-const request = require('request');
+// const request = require('request');
+const axios = require('axios');
 const http = require('http');
 
 const ajax = {
   get: (url, data, callback) => {
-    request({
-      url: url,
-      method: 'GET',
-      qs: data,
-      json: true,
-      host: 'm.kugou.com',
+    // request({
+    //   url: url,
+    //   method: 'GET',
+    //   qs: data,
+    //   json: true,
+    //   host: 'm.kugou.com',
+    //   headers: {
+    //     'host': 'm.kugou.com',
+    //     'referer': 'http://m.kugou.com/'
+    //   }
+    // }, (error, response) => {
+    //   callback(response, error);
+    // });
+    axios.get(url, {
       headers: {
-        'Host': 'm.kugou.com',
-        'Referer': 'http://m.kugou.com/'
-      }
-    }, (error, response) => {
-      callback(response, error);
+        'content-type': 'application/json',
+        referer: 'http://m.kugou.com/'
+      },
+      params: data
+    }).then(response => {
+      callback(response);
+    }).catch(e => {
+      callback(null, e);
     });
   },
   post: (url, data, callback) => {
-    request({
-      url: url,
-      method: 'POST',
-      form: data,
-      json: true,
+    // request({
+    //   url: url,
+    //   method: 'POST',
+    //   form: data,
+    //   json: true,
+    //   headers: {
+    //     'content-type': 'application/json',
+    //   }
+    // }, (error, response) => {
+    //   callback(response, error);
+    // });
+    axios.post(url, {
       headers: {
         'content-type': 'application/json',
-      }
-    }, (error, response) => {
-      callback(response, error);
+        referer: 'http://m.kugou.com/'
+      },
+      data: data
+    }).then(response => {
+      callback(response);
+    }).catch(e => {
+      callback(null, e);
     });
   },
   // get: (url, data, callback) => {
@@ -40,10 +63,10 @@ const ajax = {
   //     host: 'm.kugou.com',
   //     method: 'GET',
   //     path: url,
-  //     headers:{  
+  //     headers:{
   //       'Content-Type': 'application/json',  
-  //       'Content-Length': params.length  
-  //     }  
+  //       'Content-Length': params.length
+  //     }
   //   };
   //   let bodv = '';
   //   let req = http.request(opt, (res) => {
@@ -56,8 +79,8 @@ const ajax = {
   //     callback(bodv);
   //   });
 
-  //   req.write(params);  
-  //   req.end();  
+  //   req.write(params);
+  //   req.end();
   // }
 };
 
