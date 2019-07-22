@@ -5,6 +5,7 @@ const app = express();
 const ajax = require('./src/ajax.js');
 const api = require('./src/api.js');
 const initBanner = require('./src/core/initBanner.js');
+const initRank = require('./src/core/initRank.js');
 // body-parser解析
 app.use(bodyParser.json()); // json请求
 app.use(bodyParser.urlencoded({ // 表单请求
@@ -78,3 +79,5 @@ app.listen(13770, '0.0.0.0', () => {
 // });
 
 initBanner(app);
+
+initRank(app);
