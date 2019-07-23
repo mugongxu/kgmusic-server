@@ -4,100 +4,79 @@
  */
 const api = require('../config/api.js');
 const connectDB = require('../util/connectDB.js');
+const util = require('../util/index.js');
+const resMerge = require('../util/resMerge.js');
 
 const initBanner = (app) => {
   app.get(api.banner.url, (req, res) => {
     // 传参
     const query = req.query;
-    Promise.all([getBannerList(), getUptodateList()]).then(response => {
-      let newInfo = { banner: response[0], data: response[1] };
-      res.send({
-        errorCode: null,
-        errorMessage: null,
-        status: 0,
-        success: true,
-        data: { ...newInfo }
-      });
-    }).catch(err => {
-      res.send({
-        errorCode: 99,
-        errorMessage: err || '服务器出错',
-        status: -1,
-        success: false,
-        data: null
-      });
-    });
-  });
-}
-
-const getBannerList = () => {
-  return new Promise((resolve, reject) => {
+    const page = query.page || 1;
+    const pageSize = query.pageSize || 30;
     // 连接数据库
     connectDB((db, source) => {
-      if (!db) reject(source);
-      db.collection('banner').find().toArray((err, result) => {
-        source.close();
-        if (err) reject(err)
-        result = (result || []).map(item => {
-          return {
-            extra: item.extra,
-            id: item.id,
-            imgurl: item.imgurl,
-            online: item.online,
-            title: item.title,
-            type: item.type
-          };
+      if (!db) {
+        res.send(resMerge.error({
+          errorMessage: source || '服务器出错'
+        }));
+        return;
+      }
+      // banner
+      const getBannerList = new Promise((resolve, reject) => {
+        db.collection('banner').find().toArray((err, result) => {
+          if (err) reject(err)
+          result = (result || []).map(item => {
+            return {
+              extra: item.extra,
+              id: item.id,
+              imgurl: item.imgurl,
+              online: item.online,
+              title: item.title,
+              type: item.type
+            };
+          });
+          resolve(result);
         });
-        resolve(result);
       });
-    });
-  });
-}
-
-const getUptodateList = () => {
-  return new Promise((resolve, reject) => {
-    // 连接数据库
-    connectDB((db, source) => {
-      if (!db) reject(source);
-      db.collection('uptodate').find().toArray((err, result) => {
-        if (err) {
-          source.close();
-          reject(err);
-        }
-        result = result || [];
-        // 歌曲查询条件处理
-        if (result.length === 0) {
-          resolve([]);
-        }
-        let orOptions = result.map(item => {
-          return {
-            hash: item.hash
-          };
-        });
-        db.collection('songs').find({
-          $or: [...orOptions]
-        }).toArray((err, songs) => {
-            source.close();
-            if (err) reject(err);
-            songs = songs || [];
-            // 控制你需要返回的歌曲字段
-            songs = songs.map(item => {
-              return {
-                hash: item.hash,
-                filename: item.filename,
-                duration: item.duration,
-                addtime: item.addtime,
-                remark: item.remark,
-                fileSize: item.fileSize,
-                singerName: item.singerName,
-                singerId: item.singerId
-              };
+      // 新歌
+      const getUptodateList = new Promise((resolve, reject) => {
+        // 获取数据
+        util.getDataByPage(db, 'uptodate', {}, page, pageSize, (err, data) => {
+          if (err)  reject(err);
+          // 获取歌曲
+          let total = data.total;
+          let list = data.list;
+          util.getSongInfo(db, 'songs', list, (err, songs) => {
+            if (err)  reject(err);
+            resolve({
+              songs,
+              total
             });
-            resolve(songs);
+          });
         });
+      });
+      // 获取数据
+      Promise.all([getBannerList, getUptodateList]).then(response => {
+        source.close();
+        let bannerList = response[0] || [];
+        let songsObj = response[1] || {};
+        res.send(resMerge.success({
+          data: {
+            banner: [...bannerList],
+            list: [...(songsObj.songs || [])],
+            page,
+            pageSize,
+            total: songsObj.total || 0
+          }
+        }));
+      }).catch(err => {
+        source.close();
+        res.send(resMerge.error({
+          errorMessage: err || '服务器出错'
+        }));
       });
     });
   });
-}
+};
 
 module.exports = initBanner;

@@ -1,15 +1,15 @@
 /**
  * Created by mugongxu on 2019/7/18.
- * 首页接口初始化
+ * 歌单接口初始化
  */
 const api = require('../config/api.js');
 const connectDB = require('../util/connectDB.js');
 const util = require('../util/index.js');
 const resMerge = require('../util/resMerge.js');
 
-const initRank = (app) => {
-  // 排行榜
-  app.get(api.rankIndex.url, (req, res) => {
+const initSheet = (app) => {
+  // 音乐歌单
+  app.get(api.plistIndex.url, (req, res) => {
     // 传参
     const query = req.query;
     const rankId = Number(query.rankId || 0);
@@ -22,9 +22,9 @@ const initRank = (app) => {
           errorMessage: source || '服务器出错'
         }));
         return;
-      }
+      };
       // 获取数据
-      util.getDataByPage(db, 'rank', {}, page, pageSize, (err, data) => {
+      util.getDataByPage(db, 'sheet', {}, page, pageSize, (err, data) => {
         source.close();
         if (err) {
           res.send(resMerge.error({
@@ -35,20 +35,20 @@ const initRank = (app) => {
             data: { ...data }
           }));
         }
-      });
+      })
     });
   });
 
-  // 排行榜详情
-  app.get(api.rankInfo.url, (req, res) => {
+  // 歌单下音乐
+  app.get(api.plistList.url, (req, res) => {
     // 传参
     const query = req.query;
-    const rankId = Number(query.rankId || 0);
+    const specialid = Number(query.specialid || 0);
     const page = query.page || 1;
     const pageSize = query.pageSize || 30;
-    if (!rankId) {
+    if (!specialid) {
       res.send(resMerge.error({
-        errorMessage: 'rankId不允许为空'
+        errorMessage: 'specialid不允许为空'
       }));
       return;
     }
@@ -61,8 +61,8 @@ const initRank = (app) => {
         return;
       };
       const getInfo = new Promise((resolve, reject) => {
-        util.getSingleInfo(db, 'rank', {
-          rankid: rankId
+        util.getSingleInfo(db, 'sheet', {
+          specialid: specialid
         }, (err, data) => {
           if (err) reject(err);
           resolve(data);
@@ -70,8 +70,8 @@ const initRank = (app) => {
       });
       const getList = new Promise((resolve, reject) => {
         // 获取数据
-        util.getDataByPage(db, 'rankIndex', {
-          rankid: rankId
+        util.getDataByPage(db, 'sheetIndex', {
+          specialid: specialid 
         }, page, pageSize, (err, data) => {
           if (err)  reject(err);
           // 获取歌曲
@@ -89,16 +89,16 @@ const initRank = (app) => {
       // 数据处理
       Promise.all([getInfo, getList]).then(response => {
         source.close();
-        let rankInfo = response[0] || {};
-        let rankSongs = response[1] || {};
-        let songs = rankSongs.songs || [];
+        let sheetInfo = response[0] || {};
+        let sheetSongs = response[1] || {};
+        let songs = sheetSongs.songs || []
         res.send(resMerge.success({
           data: {
             list: [...songs],
-            info: { ...rankInfo },
+            info: { ...sheetInfo },
             page,
             pageSize,
-            total: rankSongs.total || 0
+            total: sheetSongs.total || 0
           }
         }));
       }).catch(err => {
@@ -111,4 +111,4 @@ const initRank = (app) => {
   });
 }
 
-module.exports = initRank;
+module.exports = initSheet;
