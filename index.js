@@ -7,6 +7,9 @@ const initBanner = require('./src/core/initBanner.js');
 const initRank = require('./src/core/initRank.js');
 const initSheet = require('./src/core/initSheet.js');
 const initSinger = require('./src/core/initSinger.js');
+const initHotSearch = require('./src/core/initHotSearch.js');
+const initSearch = require('./src/core/initSearch.js');
+const initSongDetail = require('./src/core/initSongDetail.js');
 
 // body-parser解析
 app.use(bodyParser.json()); // json请求
@@ -22,3 +25,6 @@ initBanner(app);
 initRank(app);
 initSheet(app);
 initSinger(app);
+initHotSearch(app);
+initSearch(app);
+initSongDetail(app);
